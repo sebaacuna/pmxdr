@@ -33,7 +33,7 @@ if (this.JSON && (!JSON.stringify || !JSON.parse))
 
 (function() {
   var alwaysTrustedOrigins = [ // always trusted origins, can be exact strings or regular expressions
-    
+    new RegExp("^https?://" + this.location.hostname + "(:\\d+)?$")
   ];
 
   if (typeof window.opera != "undefined") { // Opera 9.x postMessage fix (only for http:, not https:)
