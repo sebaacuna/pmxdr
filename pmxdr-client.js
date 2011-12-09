@@ -17,8 +17,17 @@
 				return "http://" + this.domain;
 			});
 	
-	function pmxdr(host, onload) {
+	function pmxdr(host, host_path, onload) {
 		var instance = this; // for YUI compressor
+		
+		if(typeof host_path == 'function' && onload == undefined) {
+    	    onload = host_path;
+    	    host_path = "/pmxdr/api";   
+	    }
+	    
+		if (host_path==undefined)
+	 	    host_path = "/pmxdr/api";
+		
 		instance.iFrame	= document.createElement("iframe"); // interface frame
 		instance.iFrame.style.display = "none";
 		instance.origin = host.replace(pmxdr.originRegex, "$1");
@@ -33,7 +42,7 @@
 		else if (instance.iFrame.attachEvent)
 			instance.iFrame.attachEvent("onload", onloadHandler);
 
-		instance.iFrame.src = instance.origin + "/pmxdr/api";
+		instance.iFrame.src = instance.origin + host_path;
 		if (typeof onload == "function") {
 			instance.onload = onload;
 			instance.init();
@@ -41,7 +50,7 @@
 	}
 	
 	pmxdr.originRegex = /^([\w-]+:\/*\[?[\w\.:-]+\]?(?::\d+)?).*/; // RegExp.$1 = protocol+host+port (the square brackets are for ipv6)
-	pmxdr.request = function(req) {
+	pmxdr.request = function(req, host_path) {
 		if (typeof req == "string")
 			return pmxdr.request({uri: req});
 		else if (Object.prototype.toString.call(req) == "[object Array]") { // handle array of requests
@@ -51,7 +60,7 @@
 			return requests;
 		}
 		
-		var pmxdrInstance = new pmxdr(req.uri),
+		var pmxdrInstance = new pmxdr(req.uri, host_path),
 		callback = req.callback;
 		req.id = pmxdr.getSafeID();
 		
